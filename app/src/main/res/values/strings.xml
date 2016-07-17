@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">PokeTimer</string>
+    <string name="action_settings">Settings</string>
+
+
+    <!-- Notification Text -->
+    <string name="notification_title">PokéTimer Active</string>
+    <string name="notification_text">Timer</string>
+    <string name="notification_text_ready">Spin 2 Win</string>
+
+    <!-- Buttons -->
+    <string name="button_start_hunting">Start hunting</string>
+    <string name="button_end_hunt">End hunt</string>
+    <string name="button_spin">Spin 2 win</string>
+
+</resources>
