@@ -26,21 +26,7 @@
         android:layout_height="wrap_content"
         android:text="Hello World!"
         android:layout_above="@id/start_button"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"/>
 
-    <Button
-        android:id="@+id/spin_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_spin"
-        android:layout_below="@id/start_button"
-        android:layout_centerHorizontal="true"/>
-
-    <Button
-        android:id="@+id/stop_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_end_hunt"
-        android:layout_below="@id/spin_button"
-        android:layout_centerHorizontal="true"/>
 </RelativeLayout>
