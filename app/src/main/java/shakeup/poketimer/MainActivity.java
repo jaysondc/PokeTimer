@@ -41,11 +41,19 @@ public class MainActivity extends AppCompatActivity {
         // Find buttons
         // Start button
         final Button mStartButton = (Button) findViewById(R.id.start_button);
+        // Stop button
+        final Button mStopButton = (Button) findViewById(R.id.stop_button);
 
         // Assign clicklisteners to buttons
         mStartButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v){
                 startTimer();
+            }
+        });
+
+        mStopButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v){
+                stopService(new Intent(getApplicationContext(), PoketimerService.class));
             }
         });
 
@@ -129,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
         // Start timer service. Kills and restarts timer if one already exists
         stopService(new Intent(this, PoketimerService.class));
         startService(new Intent(this, PoketimerService.class));
+        moveTaskToBack(false);
         Log.i(TAG, "User started service");
     }
 

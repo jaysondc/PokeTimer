@@ -9,6 +9,14 @@
     <string name="notification_text_ready">Pokéstops are ready!</string>
 
     <!-- Buttons -->
-    <string name="button_start_hunting">Start a timer</string>
+    <string name="button_start_timer">Start PokéTimer</string>
+    <string name="button_stop_timer">Stop PokéTimer</string>
+
+    <!-- Info Text -->
+    <string name="text_explainer">
+        PokéTimer is a convenient 5 minute timer that lives in your notification tray.
+        Swipe it down with 2 fingers to show the controls, or click it to jump
+        into this app to start a new timer.
+    </string>
 
 </resources>

@@ -10,8 +10,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.support.v7.app.NotificationCompat;
@@ -31,13 +29,13 @@ public class PoketimerService extends Service {
     public static final int NOTIFICATION_ID = 1;
     public static final int MS_START_TIMER = 300000; // 300000 = 5 min
     public static final int MS_TICK_TIMER = 1000;
-    public static final int NOTIFICATION_PRIORITY = NotificationCompat.PRIORITY_HIGH;
+    public static final int NOTIFICATION_PRIORITY = NotificationCompat.PRIORITY_MAX;
+    public static final String NOTIFICATION_CATEGORY = NotificationCompat.CATEGORY_SERVICE;
     public static final String ACTION_RESET_TIMER = "reset timer"; // Request code for resetting timer
     public static final String ACTION_STOP_TIMER = "stop timer"; // Request code for stopping timer and service
-    public static final long[] VIBRATE_PATTERN = {0, 250, 250, 250, 250, 200, 100, 200, 100, 400};
     Intent bi = new Intent(COUNTDOWN_BR);
 
-    // Shared variables
+    // Globals
     CountDownTimer cdt = null;
     android.support.v4.app.NotificationCompat.Builder mNotificationBuilder;
     NotificationManager mNotificationManager;
@@ -49,12 +47,6 @@ public class PoketimerService extends Service {
         // Assign globals
         mNotificationBuilder = new NotificationCompat.Builder(this);
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        // Push to foreground and start notification ticker
-        startForeground(NOTIFICATION_ID, makeNotification(MS_START_TIMER));
-
-        // Start timer
-        startTimer();
     }
 
     @Override
@@ -69,16 +61,24 @@ public class PoketimerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent.getAction() == null){ // Start new timer
+            // Push to foreground and start notification ticker
+            startForeground(NOTIFICATION_ID, makeNotification(MS_START_TIMER));
+            // Start timer
             startTimer();
         }
         else if(intent.getAction().equals(ACTION_RESET_TIMER)){
+            // Reset notification
             resetNotification();
+            // Start new notification
+            startForeground(NOTIFICATION_ID, makeNotification(MS_START_TIMER));
+            // Start new timer
             startTimer();
         }
         else if(intent.getAction().equals(ACTION_STOP_TIMER)){
+            // Stop entire service
             stopSelf();
         }
-        else{ // Start new timer
+        else{ // This shouldn't happen
             Log.i(TAG, "Intent specified an unknown action");
         }
         return super.onStartCommand(intent, flags, startId);
@@ -97,7 +97,7 @@ public class PoketimerService extends Service {
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setShowWhen(false)
                 .setPriority(NOTIFICATION_PRIORITY)
-                .setAutoCancel(true);
+                .setCategory(NOTIFICATION_CATEGORY);
 
         // Clicking the notification will just open the app
         Intent activityIntent = new Intent(this, MainActivity.class);
@@ -134,26 +134,23 @@ public class PoketimerService extends Service {
     }
 
     private Notification tickNotification(long millisUntilFinished) {
+        // Tick with current time remaining
         mNotificationBuilder.setContentText(getString(R.string.notification_text) + ": " + formatTimer(millisUntilFinished));
 
         return mNotificationBuilder.build();
     }
 
     private Notification spinNotification(){
-        // Set notification sound URI
-        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-        // Update notification
+        // Update notification with user vibration and sound
         mNotificationBuilder.setContentText(getString(R.string.notification_text_ready))
-                .setVibrate(VIBRATE_PATTERN)
-                .setSound(uri);
+                .setDefaults(NotificationCompat.DEFAULT_ALL);
 
         return mNotificationBuilder.build();
     }
 
     private void resetNotification(){
-        mNotificationBuilder.setVibrate(new long[] {0, 0}); // Turn off vibrate
-        mNotificationBuilder.setSound(null);
+        // Reset entire notification
+        mNotificationBuilder = new NotificationCompat.Builder(getApplicationContext());
     }
 
     private void startTimer(){
@@ -181,16 +178,15 @@ public class PoketimerService extends Service {
             @Override
             public void onFinish() {
                 Log.i(TAG, "Timer finished");
-                // Change notification info
+                // Trigger notification sound and vibration
                 mNotificationManager.notify(NOTIFICATION_ID, spinNotification());
-                // Play some notification sound
             }
         };
         cdt.start();
     }
 
     public String formatTimer(long millis){
-        // Format miliseconds to readable time format
+        // Format milliseconds to readable time format
         return String.format(Locale.getDefault(), "%02d:%02d",
                 TimeUnit.MILLISECONDS.toMinutes(millis),
                 TimeUnit.MILLISECONDS.toSeconds(millis) -
